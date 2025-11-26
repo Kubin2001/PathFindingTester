@@ -1,6 +1,7 @@
 x64/
 Libs/
 
+*.dll
 *.vcxproj
 *.vcxproj.filters
 *.vcxproj.user
