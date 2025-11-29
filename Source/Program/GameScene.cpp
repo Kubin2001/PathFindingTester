@@ -81,13 +81,41 @@ void GameScene::Input(SDL_Event& event) {
 			dest.CalcAll(p.x, p.y);
 			auto startTime = std::chrono::high_resolution_clock::now();
 
-			currentPath = BFS(map, start, dest);
+			currentPath = BFS1(map, start, dest);
 
 			auto endTime = std::chrono::high_resolution_clock::now();
 			std::chrono::duration<double, std::milli> elapsed = endTime - startTime;
 			std::println("Czas wykonania : {} ms",elapsed.count());
 			for (const auto& it : currentPath) {
 				std::println("ROW : {}  Column: {}",it.x,it.y);
+			}
+		}
+
+		if (event.key.keysym.scancode == SDL_SCANCODE_3) {
+			dest.CalcAll(p.x, p.y);
+			auto startTime = std::chrono::high_resolution_clock::now();
+
+			currentPath = BFS2(map, start, dest);
+
+			auto endTime = std::chrono::high_resolution_clock::now();
+			std::chrono::duration<double, std::milli> elapsed = endTime - startTime;
+			std::println("Czas wykonania : {} ms", elapsed.count());
+			for (const auto& it : currentPath) {
+				std::println("ROW : {}  Column: {}", it.x, it.y);
+			}
+		}
+
+		if (event.key.keysym.scancode == SDL_SCANCODE_4) {
+			dest.CalcAll(p.x, p.y);
+			auto startTime = std::chrono::high_resolution_clock::now();
+
+			currentPath = BFS3(map, start, dest);
+
+			auto endTime = std::chrono::high_resolution_clock::now();
+			std::chrono::duration<double, std::milli> elapsed = endTime - startTime;
+			std::println("Czas wykonania : {} ms", elapsed.count());
+			for (const auto& it : currentPath) {
+				std::println("ROW : {}  Column: {}", it.x, it.y);
 			}
 		}
 	}
