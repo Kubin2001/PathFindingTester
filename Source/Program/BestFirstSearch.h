@@ -18,7 +18,10 @@ struct EvalNode {
 		this->manhatanDistance = heutistic;
 	}
 
-	std::vector<EvalNode> GetChildrenBestFS(std::unordered_set<Node, NodeHash, NodeEq>& closed, const Point& dest);
+	std::vector<EvalNode> GetChildrenBestFS(std::unordered_set<Node, NodeHash, NodeEq>& closed, const Point& dest); // Managatan
+
+	//Eucklides i tylko ruch lewy prawy góra dó³
+	std::vector<EvalNode> GetChildrenBestFS2(std::unordered_set<Node, NodeHash, NodeEq>& closed, const Point& dest); 
 };
 
 struct EvalNodeComp {
@@ -31,6 +34,6 @@ struct EvalNodeComp {
 };
 
 
-int Manhatan(const Point &currentPos, const Point &dest);
-
 std::vector<Point> BestFS(Map* map, MapPos& start, MapPos& dest);
+
+std::vector<Point> BestFS2(Map* map, MapPos& start, MapPos& dest);
