@@ -22,6 +22,8 @@ struct EvalNode {
 
 	//Eucklides i tylko ruch lewy prawy góra dó³
 	std::vector<EvalNode> GetChildrenBestFS2(std::unordered_set<Node, NodeHash, NodeEq>& closed, const Point& dest); 
+
+	std::vector<EvalNode> GetChildrenBestFS3(std::unordered_set<Node, NodeHash, NodeEq>& closed, const Point& dest);
 };
 
 struct EvalNodeComp {
@@ -37,3 +39,5 @@ struct EvalNodeComp {
 std::vector<Point> BestFS(Map* map, MapPos& start, MapPos& dest);
 
 std::vector<Point> BestFS2(Map* map, MapPos& start, MapPos& dest);
+
+std::vector<Point> BestFS3(Map* map, MapPos& start, MapPos& dest);
