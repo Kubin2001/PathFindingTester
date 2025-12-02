@@ -9,6 +9,7 @@
 #include "Map.h"
 #include "BreadthFirstSearch.h"
 #include "BestFirstSearch.h"
+#include "AStarZombia.h"
 
 void CreateErrorBox(UI* ui, const std::string &text) {
 	PopUpBox *pb =  ui->CreatePopUpBoxF("name" + std::to_string(rand()), 180, 10, 10, 200, 40, nullptr, "arial12px", text);
@@ -109,6 +110,20 @@ void GameScene::Input(SDL_Event& event) {
 			auto startTime = std::chrono::high_resolution_clock::now();
 
 			currentPath = BestFS2(map, start, dest);
+
+			auto endTime = std::chrono::high_resolution_clock::now();
+			std::chrono::duration<double, std::milli> elapsed = endTime - startTime;
+			std::println("Czas wykonania : {} ms", elapsed.count());
+			//for (const auto& it : currentPath) {
+			//	std::println("ROW : {}  Column: {}", it.x, it.y);
+			//}
+		}
+
+		if (event.key.keysym.scancode == SDL_SCANCODE_5) {
+			dest.CalcAll(p.x, p.y);
+			auto startTime = std::chrono::high_resolution_clock::now();
+
+			currentPath = ZombiaAStar(map, {start.absTileRows,start.absTileColumn}, { dest.absTileRows,dest.absTileColumn });
 
 			auto endTime = std::chrono::high_resolution_clock::now();
 			std::chrono::duration<double, std::milli> elapsed = endTime - startTime;
