@@ -57,7 +57,7 @@ void GameScene::Input(SDL_Event& event) {
 	if (event.type == SDL_MOUSEBUTTONDOWN) {
 		if (event.button.button == SDL_BUTTON_LEFT) {
 			MapPos mp(p.x, p.y);
-			map->SetTile(TexMan::GetTex("grass"), false, map->GetRegions()[mp.rows][mp.column].TileMap[mp.rowsTile][mp.columnTile]);
+			map->SetTile(TexMan::GetTex("grass"), true, map->GetRegions()[mp.rows][mp.column].TileMap[mp.rowsTile][mp.columnTile]);
 		}
 		if (event.button.button == SDL_BUTTON_RIGHT) {
 			MapPos mp(p.x, p.y);
@@ -82,7 +82,7 @@ void GameScene::Input(SDL_Event& event) {
 		if (event.key.keysym.scancode == SDL_SCANCODE_2) {
 			dest.CalcAll(p.x, p.y);
 			auto startTime = std::chrono::high_resolution_clock::now();
-			currentPath = BFS4(map, start, dest);
+			currentPath = BestFS(map, start, dest);
 
 			auto endTime = std::chrono::high_resolution_clock::now();
 			std::chrono::duration<double, std::milli> elapsed = endTime - startTime;
@@ -95,7 +95,7 @@ void GameScene::Input(SDL_Event& event) {
 		if (event.key.keysym.scancode == SDL_SCANCODE_3) {
 			dest.CalcAll(p.x, p.y);
 			auto startTime = std::chrono::high_resolution_clock::now();
-			currentPath = BestFS(map, start, dest);
+			currentPath = BestFS2(map, start, dest);
 
 			auto endTime = std::chrono::high_resolution_clock::now();
 			std::chrono::duration<double, std::milli> elapsed = endTime - startTime;
@@ -109,7 +109,7 @@ void GameScene::Input(SDL_Event& event) {
 			dest.CalcAll(p.x, p.y);
 			auto startTime = std::chrono::high_resolution_clock::now();
 
-			currentPath = BestFS2(map, start, dest);
+			currentPath = BestFS3(map, start, dest);
 
 			auto endTime = std::chrono::high_resolution_clock::now();
 			std::chrono::duration<double, std::milli> elapsed = endTime - startTime;
@@ -123,7 +123,7 @@ void GameScene::Input(SDL_Event& event) {
 			dest.CalcAll(p.x, p.y);
 			auto startTime = std::chrono::high_resolution_clock::now();
 
-			currentPath = BestFS3(map, start, dest);
+			currentPath = BestFSAdv(map, start, dest);
 
 			auto endTime = std::chrono::high_resolution_clock::now();
 			std::chrono::duration<double, std::milli> elapsed = endTime - startTime;

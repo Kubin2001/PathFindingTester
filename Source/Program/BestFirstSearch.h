@@ -24,6 +24,8 @@ struct EvalNode {
 	std::vector<EvalNode> GetChildrenBestFS2(std::unordered_set<Node, NodeHash, NodeEq>& closed, const Point& dest); 
 
 	std::vector<EvalNode> GetChildrenBestFS3(std::unordered_set<Node, NodeHash, NodeEq>& closed, const Point& dest);
+
+	std::vector<EvalNode> GetChildrenBestFS4(Map* map, std::unordered_set<Node, NodeHash, NodeEq>& closed, const Point& dest);
 };
 
 struct EvalNodeComp {
@@ -41,3 +43,5 @@ std::vector<Point> BestFS(Map* map, MapPos& start, MapPos& dest);
 std::vector<Point> BestFS2(Map* map, MapPos& start, MapPos& dest);
 
 std::vector<Point> BestFS3(Map* map, MapPos& start, MapPos& dest);
+
+std::vector<Point> BestFSAdv(Map* map, MapPos& start, MapPos& dest);
