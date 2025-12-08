@@ -283,7 +283,8 @@ std::vector<Point> BestFS3(Map* map, MapPos& start, MapPos& dest) {
 	return {};
 }
 
-std::vector<Point> BestFSAdv(Map* map, MapPos& start, MapPos& dest) {
+std::vector<Point> BestFSAdv(Map* map, MapPos& start, MapPos& dest, std::vector<Point> &globalClosed) {
+	globalClosed.clear();
 	std::unordered_set<Node, NodeHash, NodeEq> closed = {};
 
 	std::priority_queue<EvalNode, std::vector<EvalNode>, EvalNodeComp> open = {};
@@ -313,6 +314,9 @@ std::vector<Point> BestFSAdv(Map* map, MapPos& start, MapPos& dest) {
 					return path;
 				}
 				path.emplace_back(lastNode.pos);
+			}
+			for (auto& it : closed) {
+				globalClosed.emplace_back(it.pos);
 			}
 			std::println("Best First Search Adv Succeded");
 			std::println("Open: {}", open.size());

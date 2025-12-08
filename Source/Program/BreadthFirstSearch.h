@@ -12,4 +12,4 @@ std::vector<Point> BFS2(Map* map, MapPos& start, MapPos& dest);
 
 std::vector<Point> BFS3(Map* map, MapPos& start, MapPos& dest);
 
-std::vector<Point> BFS4(Map* map, MapPos& start, MapPos& dest);
+std::vector<Point> BFS4(Map* map, MapPos& start, MapPos& dest, std::vector<Point>& globalClosed);

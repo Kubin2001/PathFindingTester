@@ -16,6 +16,7 @@ class GameScene :public Scene{
 		MapPos start;
 		MapPos dest;
 		std::vector<Point> currentPath;
+		std::vector<Point> currentClosed;
 
 	public:
 		void Init(MT::Renderer* renderer = nullptr, UI* ui = nullptr)override;

@@ -44,4 +44,4 @@ std::vector<Point> BestFS2(Map* map, MapPos& start, MapPos& dest);
 
 std::vector<Point> BestFS3(Map* map, MapPos& start, MapPos& dest);
 
-std::vector<Point> BestFSAdv(Map* map, MapPos& start, MapPos& dest);
+std::vector<Point> BestFSAdv(Map* map, MapPos& start, MapPos& dest, std::vector<Point>& globalClosed);

@@ -82,14 +82,11 @@ void GameScene::Input(SDL_Event& event) {
 		if (event.key.keysym.scancode == SDL_SCANCODE_2) {
 			dest.CalcAll(p.x, p.y);
 			auto startTime = std::chrono::high_resolution_clock::now();
-			currentPath = BestFS(map, start, dest);
+			currentPath = BFS4(map, start, dest, currentClosed);
 
 			auto endTime = std::chrono::high_resolution_clock::now();
 			std::chrono::duration<double, std::milli> elapsed = endTime - startTime;
 			std::println("Czas wykonania : {} ms", elapsed.count());
-			//for (const auto& it : currentPath) {
-			//	std::println("ROW : {}  Column: {}", it.x, it.y);
-			//}
 		}
 
 		if (event.key.keysym.scancode == SDL_SCANCODE_3) {
@@ -100,9 +97,6 @@ void GameScene::Input(SDL_Event& event) {
 			auto endTime = std::chrono::high_resolution_clock::now();
 			std::chrono::duration<double, std::milli> elapsed = endTime - startTime;
 			std::println("Czas wykonania : {} ms", elapsed.count());
-			//for (const auto& it : currentPath) {
-			//	std::println("ROW : {}  Column: {}", it.x, it.y);
-			//}
 		}
 
 		if (event.key.keysym.scancode == SDL_SCANCODE_4) {
@@ -114,23 +108,17 @@ void GameScene::Input(SDL_Event& event) {
 			auto endTime = std::chrono::high_resolution_clock::now();
 			std::chrono::duration<double, std::milli> elapsed = endTime - startTime;
 			std::println("Czas wykonania : {} ms", elapsed.count());
-			//for (const auto& it : currentPath) {
-			//	std::println("ROW : {}  Column: {}", it.x, it.y);
-			//}
 		}
 
 		if (event.key.keysym.scancode == SDL_SCANCODE_5) {
 			dest.CalcAll(p.x, p.y);
 			auto startTime = std::chrono::high_resolution_clock::now();
 
-			currentPath = BestFSAdv(map, start, dest);
+			currentPath = BestFSAdv(map, start, dest, currentClosed);
 
 			auto endTime = std::chrono::high_resolution_clock::now();
 			std::chrono::duration<double, std::milli> elapsed = endTime - startTime;
 			std::println("Czas wykonania : {} ms", elapsed.count());
-			//for (const auto& it : currentPath) {
-			//	std::println("ROW : {}  Column: {}", it.x, it.y);
-			//}
 		}
 
 		if (event.key.keysym.scancode == SDL_SCANCODE_6) {
@@ -142,16 +130,25 @@ void GameScene::Input(SDL_Event& event) {
 			auto endTime = std::chrono::high_resolution_clock::now();
 			std::chrono::duration<double, std::milli> elapsed = endTime - startTime;
 			std::println("Czas wykonania : {} ms", elapsed.count());
-			//for (const auto& it : currentPath) {
-			//	std::println("ROW : {}  Column: {}", it.x, it.y);
-			//}
 		}
 	}
 }
 
 void GameScene::Render() {
 	map->Render();
-	for (auto it : currentPath) {
+
+	for (auto& closed : currentClosed) {
+		MapPos mp;
+		mp.absTileRows = closed.x;
+		mp.absTileColumn = closed.y;
+		mp.RecalculateFromAbs();
+
+		MT::Rect tileRect = map->GetRegions()[mp.rows][mp.column].TileMap[mp.rowsTile][mp.columnTile].GetRectangle();
+		tileRect = camera->Transform(tileRect);
+		renderer->RenderRect(tileRect, { 0,100,255 }, 120);
+	}
+
+	for (auto &it : currentPath) {
 		MapPos mp;
 		mp.absTileRows = it.x;
 		mp.absTileColumn = it.y;

@@ -149,7 +149,8 @@ std::vector<Point> BFS3(Map* map, MapPos& start, MapPos& dest) {
 }
 
 
-std::vector<Point> BFS4(Map* map, MapPos& start, MapPos& dest) {
+std::vector<Point> BFS4(Map* map, MapPos& start, MapPos& dest, std::vector<Point>& globalClosed) {
+	globalClosed.clear();
 	std::unordered_set<Node, NodeHash, NodeEq> closed = {};
 
 	std::queue<Node> open = {};
@@ -177,6 +178,9 @@ std::vector<Point> BFS4(Map* map, MapPos& start, MapPos& dest) {
 					return path;
 				}
 				path.emplace_back(lastNode.pos);
+			}
+			for (auto& it : closed) {
+				globalClosed.emplace_back(it.pos);
 			}
 			std::println("Best First Search Succeded");
 			std::println("Open: {}", open.size());
