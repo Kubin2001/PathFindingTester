@@ -10,6 +10,7 @@
 #include "BreadthFirstSearch.h"
 #include "BestFirstSearch.h"
 #include "AStarZombia.h"
+#include "AStar.h"
 
 void CreateErrorBox(UI* ui, const std::string &text) {
 	PopUpBox *pb =  ui->CreatePopUpBoxF("name" + std::to_string(rand()), 180, 10, 10, 200, 40, nullptr, "arial12px", text);
@@ -79,17 +80,8 @@ void GameScene::Input(SDL_Event& event) {
 		if (event.key.keysym.scancode == SDL_SCANCODE_1) {
 			start.CalcAll(p.x, p.y);
 		}
+
 		if (event.key.keysym.scancode == SDL_SCANCODE_2) {
-			dest.CalcAll(p.x, p.y);
-			auto startTime = std::chrono::high_resolution_clock::now();
-			currentPath = BFS4(map, start, dest, currentClosed);
-
-			auto endTime = std::chrono::high_resolution_clock::now();
-			std::chrono::duration<double, std::milli> elapsed = endTime - startTime;
-			std::println("Czas wykonania : {} ms", elapsed.count());
-		}
-
-		if (event.key.keysym.scancode == SDL_SCANCODE_3) {
 			dest.CalcAll(p.x, p.y);
 			auto startTime = std::chrono::high_resolution_clock::now();
 			currentPath = BestFS2(map, start, dest);
@@ -99,7 +91,7 @@ void GameScene::Input(SDL_Event& event) {
 			std::println("Czas wykonania : {} ms", elapsed.count());
 		}
 
-		if (event.key.keysym.scancode == SDL_SCANCODE_4) {
+		if (event.key.keysym.scancode == SDL_SCANCODE_3) {
 			dest.CalcAll(p.x, p.y);
 			auto startTime = std::chrono::high_resolution_clock::now();
 
@@ -110,7 +102,7 @@ void GameScene::Input(SDL_Event& event) {
 			std::println("Czas wykonania : {} ms", elapsed.count());
 		}
 
-		if (event.key.keysym.scancode == SDL_SCANCODE_5) {
+		if (event.key.keysym.scancode == SDL_SCANCODE_4) {
 			dest.CalcAll(p.x, p.y);
 			auto startTime = std::chrono::high_resolution_clock::now();
 
@@ -121,11 +113,21 @@ void GameScene::Input(SDL_Event& event) {
 			std::println("Czas wykonania : {} ms", elapsed.count());
 		}
 
+		if (event.key.keysym.scancode == SDL_SCANCODE_5) {
+			dest.CalcAll(p.x, p.y);
+			auto startTime = std::chrono::high_resolution_clock::now();
+
+			currentPath = AStar(map, start, dest, currentClosed);
+
+			auto endTime = std::chrono::high_resolution_clock::now();
+			std::chrono::duration<double, std::milli> elapsed = endTime - startTime;
+			std::println("Czas wykonania : {} ms", elapsed.count());
+		}
 		if (event.key.keysym.scancode == SDL_SCANCODE_6) {
 			dest.CalcAll(p.x, p.y);
 			auto startTime = std::chrono::high_resolution_clock::now();
 
-			currentPath = ZombiaAStar(map, {start.absTileRows,start.absTileColumn}, { dest.absTileRows,dest.absTileColumn });
+			currentPath = AStar2(map, start, dest, currentClosed);
 
 			auto endTime = std::chrono::high_resolution_clock::now();
 			std::chrono::duration<double, std::milli> elapsed = endTime - startTime;
