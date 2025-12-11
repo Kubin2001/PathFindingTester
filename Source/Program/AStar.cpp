@@ -3,6 +3,8 @@
 #include <queue>
 #include <print>
 
+#include "Map.h"
+
 std::vector<Point> AStar(Map* map, MapPos& start, MapPos& dest, std::vector<Point>& globalClosed) {
 	globalClosed.clear();
 	std::unordered_set<Node, NodeHash, NodeEq> closed = {};
@@ -101,5 +103,73 @@ std::vector<Point> AStar2(Map* map, MapPos& start, MapPos& dest, std::vector<Poi
 			open.push(it);
 		}
 	}
+	return {};
+}
+
+std::vector<Point> AStarPlus(Map* map, MapPos& start, MapPos& dest, std::vector<Point>& globalClosed) {
+	globalClosed.clear();
+	if (start.absTileRows == dest.absTileRows && start.absTileColumn == dest.absTileColumn) {
+		return{};
+	}
+	// No need to check if start or dest is correct since it will be casted away in children anyway and return empty vec
+
+	// In real map  tilesTwo also need to be checked
+	if (!map->GetRegions()[start.rows][start.column].TileMap[start.rowsTile][start.columnTile].isPassable) {
+		return{};
+	}
+	if (!map->GetRegions()[dest.rows][dest.column].TileMap[dest.rowsTile][dest.columnTile].isPassable) {
+		return{};
+	}
+
+	std::unordered_set<Node, NodeHash, NodeEq> closed = {};
+
+	std::priority_queue<StarNode, std::vector<StarNode>, StarNodeComp> open = {};
+	Node startNode(Point{ start.absTileRows, start.absTileColumn }, Point{ -1,-1 });
+	Point destPoint{ dest.absTileRows,dest.absTileColumn };
+	StarNode startStarNode(startNode, FastEuclidean(startNode.pos, destPoint), 0.0f);
+
+	open.push(startStarNode);
+
+	while (!open.empty()) {
+		StarNode currentNode = open.top();
+		open.pop();
+		if (closed.contains(currentNode.node)) {
+			continue;
+		}
+		closed.insert(currentNode.node);
+		if (currentNode.node.pos.x == dest.absTileRows && currentNode.node.pos.y == dest.absTileColumn) {
+			std::vector<Point> path;
+			Node lastNode = currentNode.node;
+			path.emplace_back(lastNode.pos);
+			while (lastNode.parent.x != -1 && lastNode.parent.y != -1) {
+				Node search(lastNode.parent, lastNode.parent);
+				search.pos = lastNode.parent;
+				auto testNode = closed.find(search);
+				if (testNode != closed.end()) {
+					lastNode = *testNode;
+				}
+				else {
+					return path;
+				}
+				path.emplace_back(lastNode.pos);
+			}
+			for (auto& it : closed) {
+				globalClosed.emplace_back(it.pos);
+			}
+			//std::println("A StarPlus Succeded");
+			//std::println("Open: {}", open.size());
+			//std::println("Closed: {}", closed.size());
+			std::reverse(path.begin(), path.end());
+			return path;
+		}
+
+		std::vector<StarNode> allChildren = currentNode.GetChildrenAStar2(map, closed, destPoint, currentNode.g);
+		for (auto& it : allChildren) {
+			open.push(it);
+		}
+	}
+	//std::println("A StarPlus failed");
+	//std::println("Open: {}", open.size());
+	//std::println("Closed: {}", closed.size());
 	return {};
 }
