@@ -9,9 +9,13 @@
 
 int Manhatan(const Point& currentPos, const Point& dest);
 
-int Euclidean(const Point& currentPos, const Point& dest);
+float Euclidean(const Point& currentPos, const Point& dest);
+
+float Euclidean2(const Point& currentPos, const Point& dest);
 
 float FastEuclidean(const Point& currentPos, const Point& dest);
+
+float HeuristicOctile(const Point& a, const Point& b);
 
 class Map;
 struct NodeEq;
@@ -112,6 +116,14 @@ struct StarNode {
 	std::vector<StarNode> GetChildrenAStar(Map* map, std::unordered_set<Node, NodeHash, NodeEq>& closed, const Point& dest, const float cost);
 
 	std::vector<StarNode> GetChildrenAStar2(Map* map, std::unordered_set<Node, NodeHash, NodeEq>& closed, const Point& dest, const float cost);
+
+	std::vector<StarNode> GetChildrenAStarOct(Map* map, std::unordered_set<Node, NodeHash, NodeEq>& closed, const Point& dest, const float cost);
+
+	std::vector<StarNode> GetChildrenAStarSmart(Map* map, std::unordered_set<Node, NodeHash, NodeEq>& closed, const Point& dest, const float cost);
+
+	std::vector<StarNode> GetChildrenAStarSmart2(Map* map, std::unordered_set<Node, NodeHash, NodeEq>& closed, const Point& dest, const float cost);
+
+	std::vector<StarNode> GetChildrenAStarSmart3(Map* map, std::unordered_set<Node, NodeHash, NodeEq>& closed, const Point& dest, const float cost);
 };
 
 struct StarNodeComp {

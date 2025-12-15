@@ -85,35 +85,13 @@ void GameScene::Input(SDL_Event& event) {
 			dest.CalcAll(p.x, p.y);
 			auto startTime = std::chrono::high_resolution_clock::now();
 
-			currentPath = BestFS3(map, start, dest);
-
-			auto endTime = std::chrono::high_resolution_clock::now();
-			std::chrono::duration<double, std::milli> elapsed = endTime - startTime;
-			std::println("Czas wykonania : {} ms", elapsed.count());
-		}
-
-		if (event.key.keysym.scancode == SDL_SCANCODE_3) {
-			dest.CalcAll(p.x, p.y);
-			auto startTime = std::chrono::high_resolution_clock::now();
-
-			currentPath = BestFSAdv(map, start, dest, currentClosed);
-
-			auto endTime = std::chrono::high_resolution_clock::now();
-			std::chrono::duration<double, std::milli> elapsed = endTime - startTime;
-			std::println("Czas wykonania : {} ms", elapsed.count());
-		}
-
-		if (event.key.keysym.scancode == SDL_SCANCODE_4) {
-			dest.CalcAll(p.x, p.y);
-			auto startTime = std::chrono::high_resolution_clock::now();
-
 			currentPath = AStar(map, start, dest, currentClosed);
 
 			auto endTime = std::chrono::high_resolution_clock::now();
 			std::chrono::duration<double, std::milli> elapsed = endTime - startTime;
 			std::println("Czas wykonania : {} ms", elapsed.count());
 		}
-		if (event.key.keysym.scancode == SDL_SCANCODE_5) {
+		if (event.key.keysym.scancode == SDL_SCANCODE_3) {
 			dest.CalcAll(p.x, p.y);
 			auto startTime = std::chrono::high_resolution_clock::now();
 
@@ -123,11 +101,42 @@ void GameScene::Input(SDL_Event& event) {
 			std::chrono::duration<double, std::milli> elapsed = endTime - startTime;
 			std::println("Czas wykonania : {} ms", elapsed.count());
 		}
-		if (event.key.keysym.scancode == SDL_SCANCODE_6) {
+		if (event.key.keysym.scancode == SDL_SCANCODE_4) {
 			dest.CalcAll(p.x, p.y);
 			auto startTime = std::chrono::high_resolution_clock::now();
 
 			currentPath = AStarPlus(map, start, dest, currentClosed);
+
+			auto endTime = std::chrono::high_resolution_clock::now();
+			std::chrono::duration<double, std::milli> elapsed = endTime - startTime;
+			std::println("Czas wykonania : {} ms", elapsed.count());
+		}
+		if (event.key.keysym.scancode == SDL_SCANCODE_5) {
+			dest.CalcAll(p.x, p.y);
+			auto startTime = std::chrono::high_resolution_clock::now();
+
+			currentPath = AStarSmart(map, start, dest, currentClosed);
+
+			auto endTime = std::chrono::high_resolution_clock::now();
+			std::chrono::duration<double, std::milli> elapsed = endTime - startTime;
+			std::println("Czas wykonania : {} ms", elapsed.count());
+		}
+		if (event.key.keysym.scancode == SDL_SCANCODE_6) {
+			dest.CalcAll(p.x, p.y);
+			auto startTime = std::chrono::high_resolution_clock::now();
+
+			currentPath = AStarSmart2(map, start, dest, currentClosed);
+
+			auto endTime = std::chrono::high_resolution_clock::now();
+			std::chrono::duration<double, std::milli> elapsed = endTime - startTime;
+			std::println("Czas wykonania : {} ms", elapsed.count());
+		}
+
+		if (event.key.keysym.scancode == SDL_SCANCODE_7) {
+			dest.CalcAll(p.x, p.y);
+			auto startTime = std::chrono::high_resolution_clock::now();
+
+			currentPath = AStarSmart3(map, start, dest, currentClosed);
 
 			auto endTime = std::chrono::high_resolution_clock::now();
 			std::chrono::duration<double, std::milli> elapsed = endTime - startTime;

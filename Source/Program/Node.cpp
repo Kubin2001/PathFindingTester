@@ -7,14 +7,33 @@ int Manhatan(const Point& currentPos, const Point& dest) {
 	return std::abs(dest.x - currentPos.x) + std::abs(dest.y - currentPos.y);
 }
 
-int Euclidean(const Point& currentPos, const Point& dest) {
-	return CalculateEuclidean(currentPos.x, dest.x, currentPos.y, dest.y);
+float Euclidean(const Point& currentPos, const Point& dest) {
+	float x = std::pow(dest.x - currentPos.y, 2);
+	float y = std::pow(dest.y - currentPos.y, 2);
+	return std::sqrt(x + y);
+}
+
+float Euclidean2(const Point& currentPos, const Point& dest) {
+	float x = (dest.x - currentPos.y)* (dest.x - currentPos.y);
+	float y = (dest.y - currentPos.y) * (dest.y - currentPos.y);
+	return std::sqrt(x + y);
 }
 
 float FastEuclidean(const Point& currentPos, const Point& dest) {
 	float x = std::pow(dest.x - currentPos.x, 2);
 	float y = std::pow(dest.y - currentPos.y, 2);;
 	return x + y;
+}
+float HeuristicOctile(const Point& a, const Point& b) {
+	// Sta³e wyliczone raz, ¿eby procesor nie liczy³ w kó³ko
+	constexpr float D = 1.0f;
+	constexpr float D2 = 1.41421356f;
+
+	float dx = std::abs(static_cast<float>(a.x - b.x));
+	float dy = std::abs(static_cast<float>(a.y - b.y));
+
+	// Wzór: Tyle kroków na skos ile siê da (min), reszta prosto
+	return D * (dx + dy) + (D2 - 2 * D) * std::min(dx, dy);
 }
 
 
@@ -333,6 +352,186 @@ std::vector<StarNode> StarNode::GetChildrenAStar2(Map* map, std::unordered_set<N
 	helper(0, -1);
 	helper(0, 1);
 	helper(1, 0);
+
+	return children;
+}
+
+std::vector<StarNode> StarNode::GetChildrenAStarOct(Map* map, std::unordered_set<Node, NodeHash, NodeEq>& closed, const Point& dest, const float cost) {
+	std::vector<StarNode> children;
+	children.reserve(8);
+	MapPos mp;
+
+	float moveCost = 1.0f;
+	auto helper = [&](int8_t rd, int8_t cd)->bool {
+		mp.absTileRows = node.pos.x + rd;
+		mp.absTileColumn = node.pos.y + cd;
+		mp.RecalculateFromAbs();
+		if (mp.CorrectnessAbsTileS()) {
+			if (!map->GetRegions()[mp.rows][mp.column].TileMap[mp.rowsTile][mp.columnTile].isPassable) {
+				return false;
+			}
+			Node node(Point{ mp.absTileRows, mp.absTileColumn }, this->node.pos);
+			if (!closed.contains(node)) {
+				children.emplace_back(node, FastEuclidean(node.pos, dest), cost + moveCost);
+				return true;
+			}
+			return false;
+		}
+		return false;
+	};
+	// Prosta
+	bool rightNode = helper(0, 1);
+	bool leftNode = helper(-1, 0);
+	bool upNode = helper(0, -1);
+	bool downNode = helper(1, 0);
+
+	moveCost = 1.41f;
+
+	helper(-1, 1);
+	helper(1, 1);
+	helper(-1, -1);
+	helper(1, -1);
+
+	return children;
+}
+
+std::vector<StarNode> StarNode::GetChildrenAStarSmart(Map* map, std::unordered_set<Node, NodeHash, NodeEq>& closed, const Point& dest, const float cost) {
+	std::vector<StarNode> children;
+	children.reserve(8);
+	MapPos mp;
+
+	float moveCost = 1.0f;
+	auto helper = [&](int8_t rd, int8_t cd)->bool {
+		mp.absTileRows = node.pos.x + rd;
+		mp.absTileColumn = node.pos.y + cd;
+		mp.RecalculateFromAbs();
+		if (mp.CorrectnessAbsTileS()) {
+			if (!map->GetRegions()[mp.rows][mp.column].TileMap[mp.rowsTile][mp.columnTile].isPassable) {
+				return false;
+			}
+			Node node(Point{ mp.absTileRows, mp.absTileColumn }, this->node.pos);
+			if (!closed.contains(node)) {
+				children.emplace_back(node, Euclidean(node.pos, dest), cost + moveCost);
+				return true;
+			}
+			return false;
+		}
+		return false;
+	};
+	// Prosta
+	bool rightNode = helper(0, 1);
+	bool leftNode = helper(-1, 0);
+	bool upNode = helper(0, -1);
+	bool downNode = helper(1, 0);
+
+	moveCost = 1.42f;
+
+	if (upNode && rightNode) { // prawy górny
+		helper(-1, 1);
+	}
+	if (downNode && rightNode) { // prawy dolny
+		helper(1, 1);
+	}
+	if (upNode && leftNode) { // lewy górny
+		helper(-1, -1);
+	}
+	if (downNode && leftNode) { // lewy dolny
+		helper(1, -1);
+	}
+
+	return children;
+}
+
+std::vector<StarNode> StarNode::GetChildrenAStarSmart2(Map* map, std::unordered_set<Node, NodeHash, NodeEq>& closed, const Point& dest, const float cost) {
+	std::vector<StarNode> children;
+	children.reserve(8);
+	MapPos mp;
+
+	float moveCost = 1.0f;
+	auto helper = [&](int8_t rd, int8_t cd)->bool {
+		mp.absTileRows = node.pos.x + rd;
+		mp.absTileColumn = node.pos.y + cd;
+		mp.RecalculateFromAbs();
+		if (mp.CorrectnessAbsTileS()) {
+			if (!map->GetRegions()[mp.rows][mp.column].TileMap[mp.rowsTile][mp.columnTile].isPassable) {
+				return false;
+			}
+			Node node(Point{ mp.absTileRows, mp.absTileColumn }, this->node.pos);
+			if (!closed.contains(node)) {
+				children.emplace_back(node, HeuristicOctile(node.pos, dest) * 1.5f, cost + moveCost);
+				return true;
+			}
+			return false;
+		}
+		return false;
+	};
+	// Prosta
+	bool rightNode = helper(0, 1);
+	bool leftNode = helper(-1, 0);
+	bool upNode = helper(0, -1);
+	bool downNode = helper(1, 0);
+
+	moveCost = 1.41f;
+
+	if (upNode && rightNode) { // prawy górny
+		helper(-1, 1);
+	}
+	if (downNode && rightNode) { // prawy dolny
+		helper(1, 1);
+	}
+	if (upNode && leftNode) { // lewy górny
+		helper(-1, -1);
+	}
+	if (downNode && leftNode) { // lewy dolny
+		helper(1, -1);
+	}
+
+	return children;
+}
+
+std::vector<StarNode> StarNode::GetChildrenAStarSmart3(Map* map, std::unordered_set<Node, NodeHash, NodeEq>& closed, const Point& dest, const float cost) {
+	std::vector<StarNode> children;
+	children.reserve(8);
+	MapPos mp;
+
+	float moveCost = 1.0f;
+	auto helper = [&](int8_t rd, int8_t cd)->bool {
+		mp.absTileRows = node.pos.x + rd;
+		mp.absTileColumn = node.pos.y + cd;
+		mp.RecalculateFromAbs();
+		if (mp.CorrectnessAbsTileS()) {
+			if (!map->GetRegions()[mp.rows][mp.column].TileMap[mp.rowsTile][mp.columnTile].isPassable) {
+				return false;
+			}
+			Node node(Point{ mp.absTileRows, mp.absTileColumn }, this->node.pos);
+			if (!closed.contains(node)) {
+				children.emplace_back(node, HeuristicOctile(node.pos, dest) * 2.1f, cost + moveCost);
+				return true;
+			}
+			return false;
+		}
+		return false;
+	};
+	// Prosta
+	bool rightNode = helper(0, 1);
+	bool leftNode = helper(-1, 0);
+	bool upNode = helper(0, -1);
+	bool downNode = helper(1, 0);
+
+	moveCost = 1.41f;
+
+	if (upNode && rightNode) { // prawy górny
+		helper(-1, 1);
+	}
+	if (downNode && rightNode) { // prawy dolny
+		helper(1, 1);
+	}
+	if (upNode && leftNode) { // lewy górny
+		helper(-1, -1);
+	}
+	if (downNode && leftNode) { // lewy dolny
+		helper(1, -1);
+	}
 
 	return children;
 }
