@@ -330,7 +330,7 @@ std::vector<Point> AStarSmart2(Map* map, MapPos& start, MapPos& dest, std::vecto
 	std::priority_queue<StarNode, std::vector<StarNode>, StarNodeComp> open = {};
 	Node startNode(Point{ start.absTileRows, start.absTileColumn }, Point{ -1,-1 });
 	Point destPoint{ dest.absTileRows,dest.absTileColumn };
-	StarNode startStarNode(startNode, Euclidean2(startNode.pos, destPoint), 0.0f);
+	StarNode startStarNode(startNode, HeuristicOctile(startNode.pos, destPoint), 0.0f);
 
 	open.push(startStarNode);
 

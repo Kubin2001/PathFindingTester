@@ -1,6 +1,8 @@
 #include "Node.h"
 
 #include "Map.h"
+#include <limits>
+#include <print>
 
 int Manhatan(const Point& currentPos, const Point& dest) {
 	//return CalculateEuclidean(currentPos.x, dest.x, currentPos.y, dest.y);
@@ -222,16 +224,10 @@ std::vector<EvalNode> EvalNode::GetChildrenBestFS2(std::unordered_set<Node, Node
 			closed.insert(node);
 		}
 		};
-	//helper(-1, -1);
-	helper(-1, 0);
-	//helper(-1, 1);
-
-	helper(0, -1);
 	helper(0, 1);
-
-	//helper(1, -1);
+	helper(0, -1);
+	helper(-1, 0);
 	helper(1, 0);
-	//helper(1, 1);
 
 	return children;
 }
@@ -254,16 +250,10 @@ std::vector<EvalNode> EvalNode::GetChildrenBestFS3(std::unordered_set<Node, Node
 			closed.insert(node);
 		}
 		};
-	//helper(-1, -1);
-	helper(-1, 0);
-	//helper(-1, 1);
-
-	helper(0, -1);
 	helper(0, 1);
-
-	//helper(1, -1);
+	helper(0, -1);
+	helper(-1, 0);
 	helper(1, 0);
-	//helper(1, 1);
 
 	return children;
 }
@@ -289,9 +279,9 @@ std::vector<EvalNode> EvalNode::GetChildrenBestFS4(Map* map, std::unordered_set<
 			closed.insert(node);
 		}
 		};
-	helper(-1, 0);
-	helper(0, -1);
 	helper(0, 1);
+	helper(0, -1);
+	helper(-1, 0);
 	helper(1, 0);
 
 	return children;
@@ -318,9 +308,9 @@ std::vector<StarNode> StarNode::GetChildrenAStar(Map* map, std::unordered_set<No
 			closed.insert(node);
 		}
 		};
-	helper(-1, 0);
-	helper(0, -1);
 	helper(0, 1);
+	helper(0, -1);
+	helper(-1, 0);
 	helper(1, 0);
 
 	return children;
@@ -348,9 +338,9 @@ std::vector<StarNode> StarNode::GetChildrenAStar2(Map* map, std::unordered_set<N
 			//closed.insert(node);
 		}
 		};
-	helper(-1, 0);
-	helper(0, -1);
 	helper(0, 1);
+	helper(0, -1);
+	helper(-1, 0);
 	helper(1, 0);
 
 	return children;
@@ -381,8 +371,8 @@ std::vector<StarNode> StarNode::GetChildrenAStarOct(Map* map, std::unordered_set
 	};
 	// Prosta
 	bool rightNode = helper(0, 1);
-	bool leftNode = helper(-1, 0);
-	bool upNode = helper(0, -1);
+	bool leftNode = helper(0, -1);
+	bool upNode = helper(-1, 0);
 	bool downNode = helper(1, 0);
 
 	moveCost = 1.41f;
@@ -420,8 +410,8 @@ std::vector<StarNode> StarNode::GetChildrenAStarSmart(Map* map, std::unordered_s
 	};
 	// Prosta
 	bool rightNode = helper(0, 1);
-	bool leftNode = helper(-1, 0);
-	bool upNode = helper(0, -1);
+	bool leftNode = helper(0, -1);
+	bool upNode = helper(-1, 0);
 	bool downNode = helper(1, 0);
 
 	moveCost = 1.42f;
@@ -458,7 +448,7 @@ std::vector<StarNode> StarNode::GetChildrenAStarSmart2(Map* map, std::unordered_
 			}
 			Node node(Point{ mp.absTileRows, mp.absTileColumn }, this->node.pos);
 			if (!closed.contains(node)) {
-				children.emplace_back(node, HeuristicOctile(node.pos, dest) * 1.5f, cost + moveCost);
+				children.emplace_back(node, HeuristicOctile(node.pos, dest), cost + moveCost);
 				return true;
 			}
 			return false;
@@ -467,8 +457,8 @@ std::vector<StarNode> StarNode::GetChildrenAStarSmart2(Map* map, std::unordered_
 	};
 	// Prosta
 	bool rightNode = helper(0, 1);
-	bool leftNode = helper(-1, 0);
-	bool upNode = helper(0, -1);
+	bool leftNode = helper(0, -1);
+	bool upNode = helper(-1, 0);
 	bool downNode = helper(1, 0);
 
 	moveCost = 1.41f;
@@ -505,7 +495,7 @@ std::vector<StarNode> StarNode::GetChildrenAStarSmart3(Map* map, std::unordered_
 			}
 			Node node(Point{ mp.absTileRows, mp.absTileColumn }, this->node.pos);
 			if (!closed.contains(node)) {
-				children.emplace_back(node, HeuristicOctile(node.pos, dest) * 2.1f, cost + moveCost);
+				children.emplace_back(node, HeuristicOctile(node.pos, dest) *1.5f, cost + moveCost);
 				return true;
 			}
 			return false;
@@ -514,8 +504,8 @@ std::vector<StarNode> StarNode::GetChildrenAStarSmart3(Map* map, std::unordered_
 	};
 	// Prosta
 	bool rightNode = helper(0, 1);
-	bool leftNode = helper(-1, 0);
-	bool upNode = helper(0, -1);
+	bool leftNode = helper(0, -1);
+	bool upNode = helper(-1, 0);
 	bool downNode = helper(1, 0);
 
 	moveCost = 1.41f;
@@ -532,6 +522,55 @@ std::vector<StarNode> StarNode::GetChildrenAStarSmart3(Map* map, std::unordered_
 	if (downNode && leftNode) { // lewy dolny
 		helper(1, -1);
 	}
-
 	return children;
+}
+
+Point GenerateSimpleChildren(Map* map, const Point& node, const Point& dest, bool &stop) {
+	MapPos mp;
+
+	Point closestNode = node;
+	float bestDist = std::numeric_limits<float>::max();
+
+	auto helper = [&](int8_t rd, int8_t cd)->bool {
+		mp.absTileRows = node.x + rd;
+		mp.absTileColumn = node.y + cd;
+		mp.RecalculateFromAbs();
+		if (mp.CorrectnessAbsTileS()) {
+			Point newNode{ mp.absTileRows,mp.absTileColumn };
+			float dist = FastEuclidean(newNode, dest);
+			if (dist < bestDist) {
+				bestDist = dist;
+				closestNode = newNode;
+			}
+			return true;
+		}
+		return false;
+	};
+	// Prosta
+	bool rightNode = helper(0, 1);
+	bool leftNode = helper(0, -1);
+	bool upNode = helper(-1, 0);
+	bool downNode = helper(1, 0);
+
+
+	if (upNode && rightNode) { // prawy górny
+		helper(-1, 1);
+	}
+	if (downNode && rightNode) { // prawy dolny
+		helper(1, 1);
+	}
+	if (upNode && leftNode) { // lewy górny
+		helper(-1, -1);
+	}
+	if (downNode && leftNode) { // lewy dolny
+		helper(1, -1);
+	}
+	mp.absTileRows = closestNode.x;
+	mp.absTileColumn = closestNode.y;
+	mp.RecalculateFromAbs();
+	if (!map->GetRegions()[mp.rows][mp.column].TileMap[mp.rowsTile][mp.columnTile].isPassable) {
+		stop = true;
+		return closestNode;
+	}
+	return closestNode;
 }

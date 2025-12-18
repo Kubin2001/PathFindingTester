@@ -22,6 +22,20 @@ struct NodeEq;
 
 struct NodeHash;
 
+struct PointHash {
+	std::size_t operator()(const Point& p) const {
+		std::size_t h1 = std::hash<int>{}(p.x);
+		std::size_t h2 = std::hash<int>{}(p.y);
+		return h1 ^ (h2 + 0x9e3779b9 + (h1 << 6) + (h1 >> 2));
+	}
+};
+
+struct PointEq {
+	bool operator()(const Point& p, const Point& otherP) const {
+		return p == otherP;
+	}
+};
+
 struct Node {
 	Point pos;
 	Point parent;
@@ -134,3 +148,5 @@ struct StarNodeComp {
 		return false;
 	}
 };
+
+Point GenerateSimpleChildren(Map* map, const Point& node, const Point& dest, bool& stop);

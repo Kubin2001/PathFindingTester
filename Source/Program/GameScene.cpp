@@ -11,6 +11,7 @@
 #include "BestFirstSearch.h"
 #include "AStarZombia.h"
 #include "AStar.h"
+#include "SimplePahfinding.h"
 
 void CreateErrorBox(UI* ui, const std::string &text) {
 	PopUpBox *pb =  ui->CreatePopUpBoxF("name" + std::to_string(rand()), 180, 10, 10, 200, 40, nullptr, "arial12px", text);
@@ -137,6 +138,16 @@ void GameScene::Input(SDL_Event& event) {
 			auto startTime = std::chrono::high_resolution_clock::now();
 
 			currentPath = AStarSmart3(map, start, dest, currentClosed);
+
+			auto endTime = std::chrono::high_resolution_clock::now();
+			std::chrono::duration<double, std::milli> elapsed = endTime - startTime;
+			std::println("Czas wykonania : {} ms", elapsed.count());
+		}
+		if (event.key.keysym.scancode == SDL_SCANCODE_8) {
+			dest.CalcAll(p.x, p.y);
+			auto startTime = std::chrono::high_resolution_clock::now();
+			currentClosed.clear();
+			currentPath = SimplePathfinding(map, start, dest);
 
 			auto endTime = std::chrono::high_resolution_clock::now();
 			std::chrono::duration<double, std::milli> elapsed = endTime - startTime;
