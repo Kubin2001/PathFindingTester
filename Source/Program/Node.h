@@ -4,8 +4,12 @@
 
 
 #include <unordered_set>
+#include <array>
+#include <queue>
 
 #include "Addons.h"
+
+
 
 int Manhatan(const Point& currentPos, const Point& dest);
 
@@ -16,6 +20,18 @@ float Euclidean2(const Point& currentPos, const Point& dest);
 float FastEuclidean(const Point& currentPos, const Point& dest);
 
 float HeuristicOctile(const Point& a, const Point& b);
+
+inline float HeuristicOctileFast(const Point& a, const Point& b) {
+	// Sta³e wyliczone raz, ¿eby procesor nie liczy³ w kó³ko
+	constexpr float D = 1.0f;
+	constexpr float D2 = 1.41421356f;
+
+	const float dx = std::abs(static_cast<float>(a.x - b.x));
+	const float dy = std::abs(static_cast<float>(a.y - b.y));
+
+	// Wzór: Tyle kroków na skos ile siê da (min), reszta prosto
+	return D * (dx + dy) + (D2 - 2 * D) * std::min(dx, dy);
+}
 
 class Map;
 struct NodeEq;
@@ -114,6 +130,39 @@ struct EvalNodeComp {
 
 struct EvalNodeComp;
 
+
+
+constexpr std::array<unsigned int, 8> OctileTileCost{};
+
+template<int tileSize = 40>
+constexpr void CalcTileCosts() {
+	constexpr int centerX = 1000;
+	constexpr int centerY = 1000;
+
+	// Right
+	OctileTileCost[0] = HeuristicOctile({ centerX, centerY }, { centerX + tileSize, centerY });
+
+	// Left
+	OctileTileCost[1] = HeuristicOctile({ centerX, centerY }, { centerX - tileSize, centerY });
+
+	// Up
+	OctileTileCost[2] = HeuristicOctile({ centerX, centerY }, { centerX, centerY - tileSize });
+
+	// Down
+	OctileTileCost[3] = HeuristicOctile({ centerX, centerY }, { centerX, centerY + tileSize });
+
+	// Up-Right
+	OctileTileCost[4] = HeuristicOctile({ centerX, centerY }, { centerX + tileSize, centerY - tileSize });
+
+	// Up-Left
+	OctileTileCost[5] = HeuristicOctile({ centerX, centerY }, { centerX - tileSize, centerY - tileSize });
+
+	// Down-Right
+	OctileTileCost[6] = HeuristicOctile({ centerX, centerY }, { centerX + tileSize, centerY + tileSize });
+
+	// Down-Left
+	OctileTileCost[7] = HeuristicOctile({ centerX, centerY }, { centerX - tileSize, centerY + tileSize });
+}
 struct StarNode {
 	Node node;
 	float h = 0;
@@ -138,6 +187,8 @@ struct StarNode {
 	std::vector<StarNode> GetChildrenAStarSmart2(Map* map, std::unordered_set<Node, NodeHash, NodeEq>& closed, const Point& dest, const float cost);
 
 	std::vector<StarNode> GetChildrenAStarSmart3(Map* map, std::unordered_set<Node, NodeHash, NodeEq>& closed, const Point& dest, const float cost);
+
+	std::vector<StarNode> GetChildrenAStarLinear(Map* map, const Point& dest, const float cost);
 };
 
 struct StarNodeComp {
@@ -150,3 +201,6 @@ struct StarNodeComp {
 };
 
 Point GenerateSimpleChildren(Map* map, const Point& node, const Point& dest, bool& stop);
+
+inline static std::unordered_set<Node, NodeHash, NodeEq> AStartStaticClosed{};
+inline static std::priority_queue<StarNode, std::vector<StarNode>, StarNodeComp> AStartStaticOpen{};

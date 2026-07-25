@@ -18,3 +18,7 @@ std::vector<Point> AStarSmart(Map* map, MapPos& start, MapPos& dest, std::vector
 std::vector<Point> AStarSmart2(Map* map, MapPos& start, MapPos& dest, std::vector<Point>& globalClosed);
 
 std::vector<Point> AStarSmart3(Map* map, MapPos& start, MapPos& dest, std::vector<Point>& globalClosed);
+
+// Can be used only squentially cause it uses global deque and closed
+
+std::vector<Point> AStarLinear(Map* map, MapPos& start, MapPos& dest, std::vector<Point>& globalClosed);

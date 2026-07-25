@@ -525,6 +525,52 @@ std::vector<StarNode> StarNode::GetChildrenAStarSmart3(Map* map, std::unordered_
 	return children;
 }
 
+std::vector<StarNode> StarNode::GetChildrenAStarLinear(Map* map, const Point& dest, const float cost) {
+	std::vector<StarNode> children;
+	children.reserve(8);
+	MapPos mp;
+
+	float moveCost = 1.0f;
+	auto helper = [&](int8_t rd, int8_t cd)->bool {
+		mp.absTileRows = node.pos.x + rd;
+		mp.absTileColumn = node.pos.y + cd;
+		mp.RecalculateFromAbs();
+		if (mp.CorrectnessAbsTileS()) {
+			if (!map->GetRegions()[mp.rows][mp.column].TileMap[mp.rowsTile][mp.columnTile].isPassable) {
+				return false;
+			}
+			Node node(Point{ mp.absTileRows, mp.absTileColumn }, this->node.pos);
+			if (!AStartStaticClosed.contains(node)) {
+				children.emplace_back(node, HeuristicOctileFast(node.pos, dest) * 1.5f, cost + moveCost);
+				return true;
+			}
+			return false;
+		}
+		return false;
+		};
+	// Prosta
+	bool rightNode = helper(0, 1);
+	bool leftNode = helper(0, -1);
+	bool upNode = helper(-1, 0);
+	bool downNode = helper(1, 0);
+
+	moveCost = 1.41f;
+
+	if (upNode && rightNode) { // prawy górny
+		helper(-1, 1);
+	}
+	if (downNode && rightNode) { // prawy dolny
+		helper(1, 1);
+	}
+	if (upNode && leftNode) { // lewy górny
+		helper(-1, -1);
+	}
+	if (downNode && leftNode) { // lewy dolny
+		helper(1, -1);
+	}
+	return children;
+}
+
 Point GenerateSimpleChildren(Map* map, const Point& node, const Point& dest, bool &stop) {
 	MapPos mp;
 

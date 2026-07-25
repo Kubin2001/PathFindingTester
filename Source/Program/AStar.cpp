@@ -425,9 +425,9 @@ std::vector<Point> AStarSmart3(Map* map, MapPos& start, MapPos& dest, std::vecto
 				}
 				path.emplace_back(lastNode.pos);
 			}
-			for (auto& it : closed) {
-				globalClosed.emplace_back(it.pos);
-			}
+			//for (auto& it : closed) {
+			//	globalClosed.emplace_back(it.pos);
+			//}
 			std::println("A StarSmart3 Succeded");
 			std::println("Open: {}", open.size());
 			std::println("Closed: {}", closed.size());
@@ -443,5 +443,73 @@ std::vector<Point> AStarSmart3(Map* map, MapPos& start, MapPos& dest, std::vecto
 	std::println("A StarSmart3 failed");
 	std::println("Open: {}", open.size());
 	std::println("Closed: {}", closed.size());
+	return {};
+}
+
+std::vector<Point> AStarLinear(Map* map, MapPos& start, MapPos& dest, std::vector<Point>& globalClosed) {
+	globalClosed.clear();
+	AStartStaticClosed.clear();
+	AStartStaticOpen = {};
+	if (start.absTileRows == dest.absTileRows && start.absTileColumn == dest.absTileColumn) {
+		return{};
+	}
+	// No need to check if start or dest is correct since it will be casted away in children anyway and return empty vec
+
+	// In real map  tilesTwo also need to be checked
+	if (!map->GetRegions()[start.rows][start.column].TileMap[start.rowsTile][start.columnTile].isPassable) {
+		return{};
+	}
+	if (!map->GetRegions()[dest.rows][dest.column].TileMap[dest.rowsTile][dest.columnTile].isPassable) {
+		return{};
+	}
+
+	
+	Node startNode(Point{ start.absTileRows, start.absTileColumn }, Point{ -1,-1 });
+	Point destPoint{ dest.absTileRows,dest.absTileColumn };
+	StarNode startStarNode(startNode, HeuristicOctileFast(startNode.pos, destPoint), 0.0f);
+
+	AStartStaticOpen.push(startStarNode);
+
+	while (!AStartStaticOpen.empty()) {
+		StarNode currentNode = AStartStaticOpen.top();
+		AStartStaticOpen.pop();
+		if (AStartStaticClosed.contains(currentNode.node)) {
+			continue;
+		}
+		AStartStaticClosed.insert(currentNode.node);
+		if (currentNode.node.pos.x == dest.absTileRows && currentNode.node.pos.y == dest.absTileColumn) {
+			std::vector<Point> path;
+			Node lastNode = currentNode.node;
+			path.emplace_back(lastNode.pos);
+			while (lastNode.parent.x != -1 && lastNode.parent.y != -1) {
+				Node search(lastNode.parent, lastNode.parent);
+				search.pos = lastNode.parent;
+				auto testNode = AStartStaticClosed.find(search);
+				if (testNode != AStartStaticClosed.end()) {
+					lastNode = *testNode;
+				}
+				else {
+					return path;
+				}
+				path.emplace_back(lastNode.pos);
+			}
+			//for (auto& it : AStartStaticClosed) {
+			//	globalClosed.emplace_back(it.pos);
+			//}
+			std::println("A StarSmart3 Succeded");
+			std::println("Open: {}", AStartStaticOpen.size());
+			std::println("Closed: {}", AStartStaticClosed.size());
+			std::reverse(path.begin(), path.end());
+			return path;
+		}
+
+		std::vector<StarNode> allChildren = currentNode.GetChildrenAStarLinear(map, destPoint, currentNode.g);
+		for (auto& it : allChildren) {
+			AStartStaticOpen.push(it);
+		}
+	}
+	std::println("A StarLinear failed");
+	std::println("Open: {}", AStartStaticOpen.size());
+	std::println("Closed: {}", AStartStaticClosed.size());
 	return {};
 }
